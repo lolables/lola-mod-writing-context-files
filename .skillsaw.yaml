@@ -1,0 +1,50 @@
+# skillsaw configuration
+# https://github.com/stbenjam/skillsaw
+#
+# Scope: `task lint:content` runs `skillsaw lint --strict` repo-wide (no path
+# argument), so this file excludes directories that are not real module
+# content:
+#   - tests/fixtures/**      — intentionally-invalid modules exercised by
+#     tests/lint-structure.bats; they must stay broken to prove the structural
+#     linter catches them.
+#
+# module/ itself is NOT excluded and must pass on its own merits.
+#
+# `version` must track the skillsaw ruleset you want to enforce: without it,
+# skillsaw assumes 0.6.0 and silently disables every rule added since, which is
+# a much weaker gate than it looks. The linter runs as `skillsaw@latest` (see
+# Taskfile.yml `lint:content`), so keep this in sync with whatever `skillsaw
+# @latest` currently resolves to.
+version: "0.17.0"
+
+exclude:
+  - "tests/fixtures/**"
+
+# Two rules fire at info level against content this repo ships deliberately: a
+# judgment-method skill body that is prose by genre, and bare paths that
+# markdown-link syntax would not make any more legible to an agent.
+# `docs/module-internals.md` records the reasoning per finding.
+#
+# `content-section-length` is promoted alongside them but currently baselines
+# nothing — its one finding was fixed rather than excused. It stays promoted so
+# the next over-long section fails instead of whispering at info level.
+#
+# Rather than leave them as permanent `-v` noise, they are promoted to
+# `warning` and the current set is frozen in `.skillsaw-baseline.json`. This is
+# a ratchet, not a suppression: `--strict` fails on any violation of these
+# rules that is not already in the baseline, and `content-actionability-score`
+# is baselined in `floor` mode, so a file that gets *less* actionable than its
+# recorded score fails too. The severity is `warning` because `baseline` only
+# captures errors and warnings — info-level violations are never baselined,
+# whatever `fail-on` says.
+#
+# Refresh after a deliberate change: `uvx skillsaw@latest baseline .`, then
+# review the diff. A shrinking baseline is good news; a growing one needs a
+# reason in the commit message.
+rules:
+  content-actionability-score:
+    severity: warning
+  content-section-length:
+    severity: warning
+  content-unlinked-internal-reference:
+    severity: warning

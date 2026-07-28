@@ -1,0 +1,12 @@
+# Follow `source`/`.` directives so variables defined in one file and used in
+# another are not misreported as unused (SC2034) or unfollowable (SC1091).
+# Equivalent to `shellcheck -x`, and auto-discovered by both local runs and CI
+# linters (MegaLinter). No script currently sources a helper — both scripts under
+# .taskfiles/scripts/ are standalone — so this is inert today and kept for the
+# first one that does.
+external-sources=true
+
+# Resolve `source=...` directives relative to each script's own directory, so a
+# script finds its helper whether shellcheck runs from the repo root (CI) or
+# from within .taskfiles/scripts/ (local).
+source-path=SCRIPTDIR

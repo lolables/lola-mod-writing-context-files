@@ -1,0 +1,4 @@
+title = "betterleaks config for lola module template"
+
+[extend]
+useDefault = true

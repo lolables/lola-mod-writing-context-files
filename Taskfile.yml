@@ -1,0 +1,84 @@
+version: '3'
+
+vars:
+  # MODULE is the module's identity for the quality gates (test/cleanroom).
+  MODULE: writing-context-files
+  MODE: '{{.MODE | default "human"}}'
+  CONTAINER_ENGINE:
+    sh: command -v podman >/dev/null 2>&1 && echo podman || { command -v docker >/dev/null 2>&1 && echo docker || echo ""; }
+  IMAGE: lola-mod-cleanroom
+
+tasks:
+  default:
+    silent: true
+    cmd: |
+      task --list 2>/dev/null
+
+  lint:
+    desc: 'Structural lint of the module. MODE=llm for errors-only.'
+    cmd: bash "{{.ROOT_DIR}}/.taskfiles/scripts/lint-structure.sh" --module . --mode {{.MODE}}
+
+  lint:content:
+    desc: Content-quality lint with skillsaw (needs uvx)
+    cmds:
+      - |
+        if ! command -v uvx >/dev/null 2>&1; then
+          echo "skillsaw needs uvx (from uv). Install uv or skip content lint." >&2; exit 1
+        fi
+        # skillsaw@latest so a stale uvx cache can't pin us to an older linter;
+        # keep .skillsaw.yaml `version:` in sync with the latest release.
+        uvx skillsaw@latest lint --strict .
+
+  test:unit:
+    desc: Run the bats suites for the quality-gate scripts
+    preconditions:
+      - sh: command -v bats
+        msg: 'bats-core is required. Install it: https://bats-core.readthedocs.io/'
+      # verify-oracle.bats drives the real lola binary. Presence only: the
+      # oracle owns the >=0.5.0 floor and reports it, so the version is not
+      # duplicated here where it would rot out of sync. Beware that a second,
+      # older lola under /usr/local/bin outranks ~/.local/bin on any PATH that
+      # does not prepend it, which is how this surfaced.
+      - sh: command -v lola
+        msg: 'lola is required by tests/verify-oracle.bats. Install it: uv tool install --force git+https://github.com/LobsterTrap/lola@v0.7.0'
+    cmd: bats tests/
+
+  test:
+    desc: 'Host install-verify at both scopes. MODE=llm for errors-only.'
+    cmds:
+      - mkdir -p .test-output
+      - bash "{{.ROOT_DIR}}/.taskfiles/scripts/verify-lola-module.sh" --module . --name {{.MODULE}} --scope user --mode {{.MODE}}
+      - bash "{{.ROOT_DIR}}/.taskfiles/scripts/verify-lola-module.sh" --module . --name {{.MODULE}} --scope project --mode {{.MODE}}
+
+  check:
+    desc: Run all quality gates (structural lint + content lint + unit + install verify)
+    cmds:
+      - task: lint
+      - task: lint:content
+      - task: test:unit
+      - task: test
+
+  cleanroom:build:
+    desc: Build the UBI10 cleanroom image (podman preferred, docker fallback)
+    preconditions:
+      - sh: '[ -n "{{.CONTAINER_ENGINE}}" ]'
+        msg: 'No container engine found. Install podman (preferred) or docker.'
+    cmds:
+      - 'echo "Using container engine: {{.CONTAINER_ENGINE}}"'
+      - '{{.CONTAINER_ENGINE}} build -t {{.IMAGE}} -f Containerfile .'
+
+  cleanroom:
+    desc: Build + install-verify inside the container at both scopes
+    deps: [cleanroom:build]
+    cmds:
+      - |
+        {{.CONTAINER_ENGINE}} run --rm -v "$PWD:/work:ro,Z" {{.IMAGE}} -c '
+          set -e
+          cp -R /work /tmp/mod && cd /tmp/mod
+          bash .taskfiles/scripts/verify-lola-module.sh --module . --name {{.MODULE}} --scope user --mode {{.MODE}}
+          bash .taskfiles/scripts/verify-lola-module.sh --module . --name {{.MODULE}} --scope project --mode {{.MODE}}
+        '
+
+  clean:
+    desc: Remove test output
+    cmd: rm -rf .test-output

@@ -1,0 +1,39 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  megalinter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: MegaLinter
+        uses: oxsecurity/megalinter@v9
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  install-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install Task
+        uses: arduino/setup-task@v3
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      # task check depends on test:unit, whose precondition is `command -v bats`.
+      # Without this step the gate fails before running a single test.
+      - name: Install bats
+        run: sudo apt-get update && sudo apt-get install -y bats
+      - name: Install lola
+        run: uv tool install --python 3.13 "git+https://github.com/LobsterTrap/lola@v0.7.0"
+      - name: Quality gates (lint + skillsaw + unit + host verify)
+        run: task check
+      - name: Container cleanroom
+        run: task cleanroom

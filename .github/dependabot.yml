@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+  # Despite the ecosystem name, Dependabot's docker file-fetcher matches any
+  # file whose name contains "dockerfile" or "containerfile" (case-insensitive;
+  # see dependabot-core's docker/file_fetcher.rb, DOCKER_REGEXP =
+  # /dockerfile|containerfile/i), so this scans our root `Containerfile`.
+  # Confirmed against dependabot-core source and dependabot-core#6067 (closed
+  # as completed: "Support for files named `Containerfile` rather than
+  # `Dockerfile`").
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+    ignore:
+      # The Containerfile is held at ubi10-minimal:10.1 because 10.2 and latest
+      # fail signature verification on RHEL-family hosts. CI runs on
+      # ubuntu-latest, which accepts any image, so a Dependabot bump here would
+      # go green and break `task cleanroom` for every developer on RHEL or
+      # CentOS Stream. Lift this once the Containerfile comment's condition is
+      # met, not before.
+      - dependency-name: "registry.access.redhat.com/ubi10-minimal"

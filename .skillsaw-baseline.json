@@ -1,0 +1,74 @@
+{
+  "version": "1",
+  "generated_by": "skillsaw 0.17.0",
+  "generated_at": "2026-07-28T21:06:34.543705+00:00",
+  "violations": [
+    {
+      "fingerprint": "58a78d94a34e735a",
+      "rule_id": "content-actionability-score",
+      "file_path": "AGENTS.md",
+      "message": "Low actionability score: 36/100 (verbs: 29%, commands: 55%, paths: 29%)",
+      "severity": "warning",
+      "value": 36,
+      "baseline_mode": "floor"
+    },
+    {
+      "fingerprint": "54ff2ce2b527121a",
+      "rule_id": "content-actionability-score",
+      "file_path": "module/skills/writing-context-files/SKILL.md",
+      "message": "Low actionability score: 23/100 (verbs: 39%, commands: 8%, paths: 7%)",
+      "severity": "warning",
+      "value": 23,
+      "baseline_mode": "floor"
+    },
+    {
+      "fingerprint": "5eeec0654bb9e9c7",
+      "rule_id": "content-actionability-score",
+      "file_path": "module/skills/writing-context-files/references/measuring.md",
+      "message": "Low actionability score: 13/100 (verbs: 27%, commands: 0%, paths: 0%)",
+      "severity": "warning",
+      "value": 13,
+      "baseline_mode": "floor"
+    },
+    {
+      "fingerprint": "11986526ceb3992a",
+      "rule_id": "content-unlinked-internal-reference",
+      "file_path": "AGENTS.md",
+      "line": 38,
+      "message": "Unlinked path reference: 'module/AGENTS.md' \u2014 consider wrapping in link syntax [module/AGENTS.md](module/AGENTS.md)",
+      "severity": "warning"
+    },
+    {
+      "fingerprint": "c51bc9c958e9422f",
+      "rule_id": "content-unlinked-internal-reference",
+      "file_path": "AGENTS.md",
+      "line": 40,
+      "message": "Unlinked path reference: 'docs/module-internals.md' \u2014 consider wrapping in link syntax [docs/module-internals.md](docs/module-internals.md) (file exists, autofixable)",
+      "severity": "warning"
+    },
+    {
+      "fingerprint": "61563ba37d921d48",
+      "rule_id": "content-unlinked-internal-reference",
+      "file_path": "AGENTS.md",
+      "line": 46,
+      "message": "Unlinked path reference: 'docs/module-internals.md' \u2014 consider wrapping in link syntax [docs/module-internals.md](docs/module-internals.md) (file exists, autofixable)",
+      "severity": "warning"
+    },
+    {
+      "fingerprint": "180e3afbd0fa7862",
+      "rule_id": "content-unlinked-internal-reference",
+      "file_path": "module/skills/writing-context-files/SKILL.md",
+      "line": 30,
+      "message": "Unlinked path reference: 'references/measuring.md' \u2014 consider wrapping in link syntax [references/measuring.md](references/measuring.md) (file exists, autofixable)",
+      "severity": "warning"
+    },
+    {
+      "fingerprint": "f4c9dc7d109d62fa",
+      "rule_id": "content-unlinked-internal-reference",
+      "file_path": "module/skills/writing-context-files/SKILL.md",
+      "line": 93,
+      "message": "Unlinked path reference: 'docs/grammar.md' \u2014 consider wrapping in link syntax [docs/grammar.md](docs/grammar.md)",
+      "severity": "warning"
+    }
+  ]
+}

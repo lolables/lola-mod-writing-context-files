@@ -1,0 +1,11 @@
+.lola/
+.claude/
+.cursor/
+.gemini/
+.opencode/
+.openclaw/
+/CLAUDE.md
+/GEMINI.md
+.test-output/
+megalinter-reports/
+docs/superpowers/
