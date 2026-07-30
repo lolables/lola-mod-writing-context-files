@@ -8,7 +8,7 @@
 # insecureAcceptAnything, so CI cannot catch a regression here — Dependabot is
 # told to leave this image alone. Revisit when Red Hat's published signatures
 # and containers-common agree again; see docs/module-internals.md.
-FROM registry.access.redhat.com/ubi10-minimal:10.1
+FROM registry.access.redhat.com/ubi10-minimal:10.2
 
 RUN microdnf -y install ca-certificates git tar gzip findutils shadow-utils \
     && microdnf clean all
