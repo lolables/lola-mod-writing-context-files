@@ -1,0 +1,62 @@
+module/skills/writing-context-files/SKILL.md
+  s_aa2bd794e1940b::t_577689a848fb90 16,21-22
+  s_aa2bd794e1940b::t_97e8f752af5c00 18-19,30-31,149-150,207-208
+  s_aa2bd794e1940b::t_8d38c1f57dd973 17,23-24,147-148,214-215
+  s_aa2bd794e1940b::t_bb53d8129e5399 103-104,106-110
+  s_aa2bd794e1940b::t_7a3cf10d91c097 47
+  s_aa2bd794e1940b::t_467e00c8cdaf78 173-174
+  s_aa2bd794e1940b::t_08b9a395e51cdc 29
+module/skills/writing-context-files/references/security.md
+  s_aa2bd794e1940b::t_a05a4832d73fd1 12-13,21-23,27-28,30-31,36-39,44-52,58-60
+  s_aa2bd794e1940b::t_3c3c72fb74fc65 1-8,10-11
+  s_aa2bd794e1940b::t_c1a60ac0b203d9 9,17-20,25-26,29,32-35,43,55
+  s_aa2bd794e1940b::t_b4d0d2a531e355 14-16,24,40-42,53-54,56-57,61-66
+module/skills/writing-context-files/references/loading.md
+  s_aa2bd794e1940b::t_8bd9a025151f5c 3-4,6,8-10,22-25,29-32,36-41,45-49,53-56
+  s_aa2bd794e1940b::t_0e06ec4954c834 1-2,5,7
+  s_aa2bd794e1940b::t_72fd74919fc912 13-18
+  s_aa2bd794e1940b::t_a05a4832d73fd1 11-12,19-21,26-28,33-35,42-44,50-52
+module/skills/writing-context-files/references/measuring.md
+  s_aa2bd794e1940b::t_6bb69158512da2 46
+  s_aa2bd794e1940b::t_7a844dafb4f390 20-45,47
+.skillsaw.yaml
+  s_aa2bd794e1940b::t_a7ff4e47f0cd90 10-11,26-28,30,34,37
+  s_aa2bd794e1940b::t_faa9b74f2c7b4d 20,24
+CHANGELOG.md
+  s_aa2bd794e1940b::t_ca951744d08328 16-17,30-32
+  s_aa2bd794e1940b::t_fbbdf95e41485b 7-13,18-29,33-45
+  s_aa2bd794e1940b::t_34ed3dc0aa2d1a 14-15
+.skillsaw-baseline.json
+  s_aa2bd794e1940b::t_2c70d0e7fa4e44 23
+  s_aa2bd794e1940b::t_a7ff4e47f0cd90 3,11,19-22,24-27,35,39,43
+  s_aa2bd794e1940b::t_df7b096cd2c6d0 4,31,42
+README.md
+  s_aa2bd794e1940b::t_713133efaf3718 20,22,33-37,40-49,54-56,63-67,138
+  s_aa2bd794e1940b::t_3c640384d256eb 135-137,139-141
+  s_aa2bd794e1940b::t_7d8475cee4f708 21
+.markdownlint.yml
+  s_aa2bd794e1940b::t_78c733a76479a0 4-5
+docs/module-internals.md
+  s_aa2bd794e1940b::t_37dc26aaa6175d 403,412-416,421,425,429
+  s_aa2bd794e1940b::t_34ed3dc0aa2d1a 484-485
+  s_aa2bd794e1940b::t_5f37bba0df4af6 486,488-494
+  s_aa2bd794e1940b::t_1d9afe2d6b694f 500-507
+  s_aa2bd794e1940b::t_ae5becf62ee691 146-192
+  s_aa2bd794e1940b::t_ac5905f2ecf7c4 434-436,442-459
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "90dee2b2743664e7991d08b3c46a11b4a6a1e388",
+  "prompts": {},
+  "sessions": {
+    "s_aa2bd794e1940b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43b39d3-c7d7-47bb-aaa9-7448b51e8cad",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "writing-context-files <writing-context-files@invalid>"
+    }
+  }
+}
