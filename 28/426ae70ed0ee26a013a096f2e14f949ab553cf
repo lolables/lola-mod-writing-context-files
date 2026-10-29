@@ -1,0 +1,24 @@
+module/skills/writing-context-files/references/security.md
+  s_aa2bd794e1940b::t_e2b2087c162479 24-27,31,34-39
+docs/module-internals.md
+  s_aa2bd794e1940b::t_e29e0d992fecd1 114-117,223-241
+  s_aa2bd794e1940b::t_aa0af0459c3b48 242
+CHANGELOG.md
+  s_aa2bd794e1940b::t_e29e0d992fecd1 15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "28426ae70ed0ee26a013a096f2e14f949ab553cf",
+  "prompts": {},
+  "sessions": {
+    "s_aa2bd794e1940b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43b39d3-c7d7-47bb-aaa9-7448b51e8cad",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "writing-context-files <writing-context-files@invalid>"
+    }
+  }
+}
