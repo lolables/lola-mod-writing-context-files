@@ -13,21 +13,22 @@ description: >-
 
 # Writing context files
 
-Repository context files (AGENTS.md, CLAUDE.md, and friends) are prepended to
-**every** agent turn, so every line is paid for on every request. Your job is
-subtraction: keep only what the agent both needs and cannot get elsewhere.
+Repository context files (AGENTS.md, CLAUDE.md, and friends) load into
+**every** agent session, and agents act on every line — measured, they do not
+reliably raise success, and often raise cost. Your job is subtraction: keep
+only what the agent both needs and cannot get elsewhere.
 
-This reasoning is premised on *always-loaded* files. If a file is loaded lazily
-— a skill body, a `docs/` page, a README read only when asked — the per-turn tax
-does not apply and everything below is far weaker. Confirm which files your
-harness auto-loads before auditing.
+This reasoning is premised on *always-loaded* files; for a lazily-loaded skill
+body or `docs/` page it is far weaker. Harnesses differ in what they load and
+when: before placing or auditing anything, read `references/loading.md`
+(relative to this skill's directory, `SKILL_DIR`).
 
 The file itself is optional: if the tests below empty it, a near-empty file or
 none is the right output — don't pad.
 
-When the user asks whether a file is worth keeping, or how to prove it helps,
-read `references/measuring.md` (relative to this skill's directory, `SKILL_DIR`)
-— that guidance is for the human making the call, not for the audit itself.
+When the user asks whether a file is worth keeping, how to prove it helps, or
+what evidence backs this method, read `references/measuring.md` — that
+guidance is for the human making the call, not for the audit itself.
 
 ## The discoverability test
 
@@ -43,7 +44,7 @@ the file:
   in UTC; tests assume it").
 - **Yes** (discoverable) → cut it. The agent reconstructs architecture,
   module layout, and "how it works" from source faster than it trusts a prose
-  summary — and the summary rots. This is the category the research found
+  summary — and the summary rots. This is the category measured as
   **inert**: repository overviews, despite being widely recommended, buy
   nothing while costing tokens on every turn.
 
@@ -99,16 +100,14 @@ whether following it is worth the cost. Attach the condition:
 The **trigger — the "when" — is the payload**, not the path. The agent can grep
 its way to the file; what it cannot infer is *when that file becomes relevant*,
 and that "when" is itself non-discoverable — which is what justifies the
-deferred load.
+deferred load. An import directive that splices the file in at load time is
+inlining, not linking.
 
-**Needed only in a subtree → scope it, don't centralize.** Most harnesses load
-the *nearest* instruction file up the tree, often concatenating ancestors. A
-rule governing only `/backend` belongs in `/backend/AGENTS.md`, not the root —
-centralizing it taxes every turn spent elsewhere. Location scoping is
-lazy-loading by *place*: when a rule maps cleanly onto a directory it beats even
-a triggered link, costing no tool call, just a narrower always-loaded scope.
-Confirm your harness does hierarchical / nearest-file loading before relying on
-this.
+**Needed only in a subtree or for some files → scope it, don't centralize.** A
+rule governing only `/backend` belongs in `/backend/AGENTS.md`, or a path-scoped
+rule file, not the root — centralizing it taxes every turn spent elsewhere.
+Scoping is lazy-loading by *place*: when a rule maps cleanly onto a directory or
+file pattern it beats even a triggered link, costing no tool call.
 
 **Tied to one site in the code → annotate it there.** A constraint governing a
 specific function, route table or config block can live as a comment on that
@@ -145,8 +144,10 @@ discoverability test then filters whatever residue remains.
 Mechanization is a *proposal*, not work you perform or force on the user. Name
 the mechanism by kind — a secret-scanning pre-commit hook, an import-boundary
 linter, a CI gate — and if you name a concrete tool, choose one that fits the
-repository's actual stack, not a default. And sequence it safely: **the prose
-stays until the mechanism exists.** Cutting "never commit secrets" in anticipation of a
+repository's actual stack, not a default. Prefer CI gates and linters to
+agent-harness hooks: a committed hook is code every clone runs with its user's
+privileges, and one that asks a model to judge is probabilistic again. And
+sequence it safely: **the prose stays until the mechanism exists.** Cutting "never commit secrets" in anticipation of a
 hook nobody has added drops the rule rather than moving it. Present mechanization
 as a migration the user adopts at their pace; only a rule whose gate is already
 in place leaves the file now.
@@ -169,7 +170,8 @@ in place leaves the file now.
 command, target and path the file names against the repository. An item routed
 to *mechanize* or *scope* never gets checked otherwise, and proposing a CI gate
 around a `make` target that no longer exists automates a footgun — agents obey
-wrong instructions as readily as right ones. Then classify each section:
+wrong instructions as readily as right ones. Run the security pass in
+`references/security.md` — on authoring too. Then classify each section:
 
 - Overview / architecture / "how it works" prose → flag for **deletion**
   (offer to relocate to maintainer docs).
@@ -202,21 +204,14 @@ discoverability question of each line as if you had never written it.
 ## Output
 
 When auditing, produce one table — columns `item → verdict → why` — grouped by
-verdict (delete / keep / mechanize / scope / annotate / fix-trigger) so the user
-can approve in batches. Split rows at the granularity of a single *decision*,
+verdict (security / delete / keep / mechanize / scope / annotate /
+fix-trigger) so the user can approve in batches. Split rows at the granularity of a single *decision*,
 not a whole section. A mostly-discoverable section routinely hides one keeper —
 a branch-naming convention buried in a git-worktree tutorial, a tenant-isolation
 *exception* inside a protobuf block. Give that keeper its own row (e.g. `carve
 from §N → keep`); a coarse "delete this section" verdict sweeps it away with the
 discoverable bulk around it, and the loss is silent. When authoring, produce the
-file plus a brief list of the rules you moved to automation instead of prose.
+file, a brief list of the rules you moved to automation instead of prose, and
+any security findings.
 Keep the meta-commentary out of the context file itself — it, too, must pass the
 discoverability test.
-
-## Source
-
-The empirical claims above (no reliable success-rate gain, ~20% average cost
-increase, overviews inert while instructions are followed) come from:
-Gloaguen, Mündler, Müller, Raychev, Vechev, *"Evaluating AGENTS.md: Are
-Repository-Level Context Files Helpful for Coding Agents?"* (2026),
-<https://arxiv.org/abs/2602.11988>

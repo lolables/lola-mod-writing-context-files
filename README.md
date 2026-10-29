@@ -17,9 +17,9 @@ instruction files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursorrules`,
 
 ## What the skill does
 
-These files are prepended to every agent turn, so every line is paid for on
-every request. The skill treats authoring as subtraction and applies a fixed
-method:
+These files load into every agent session, and agents act on every line:
+measured, they do not reliably raise success, and often raise cost. The skill treats
+authoring as subtraction and applies a fixed method:
 
 - The _discoverability test_ asks whether the agent can rederive a line by
   reading the repository. If it can, cut the line. Architecture overviews and
@@ -30,26 +30,41 @@ method:
   commit message or `docs/`. Keep the rule, cut the essay around it.
 - The _sort_ puts every survivor in one of five places. Inlined (always
   needed), deleted (never needed), linked _with a trigger_ (sometimes needed),
-  scoped to a subdirectory (needed only there), or annotated as a comment at
-  the one site in the code it governs.
+  scoped to a subdirectory or path-scoped rule file (needed only there), or
+  annotated as a comment at the one site in the code it governs. Because
+  harnesses load files differently — eager `@` imports, nested files Codex
+  never reads, `AGENTS.md` ignored beside a `CLAUDE.md` — the skill checks the
+  target harness's loading behaviour before placing anything.
 - _Mechanization_ outranks prose. Any rule a hook, linter, or CI gate can
   enforce is a candidate for moving out of the file, because deterministic beats
-  probabilistic. The prose stays until the mechanism exists.
+  probabilistic. The prose stays until the mechanism exists. Gates outside the
+  agent session (CI, linters) are preferred to agent hooks, which are code a
+  cloned repository runs with your privileges.
+- A _security pass_ runs on every audit and authored file. It treats files you
+  did not write as untrusted input, inventories every instruction file the
+  harness would load (including untracked ones), scans raw bytes for invisible
+  and bidirectional Unicode, flags instructions that exfiltrate, install from
+  unknown sources or weaken safety, removes secrets, and reviews the agent
+  config beside the file (hooks, MCP servers, auto-approve settings) that
+  executes code.
 - _Validating the cut_ comes last. Over-cutting is the asymmetric risk, so the
   cut list goes to an independent reviewer and gets challenged adversarially
   before it stands.
 
-Audits produce an `item → verdict → why` table grouped by verdict, so you can
-approve in batches rather than accept a silent rewrite.
+Audits produce an `item → verdict → why` table grouped by verdict, with
+security findings first, so you can approve in batches rather than accept a
+silent rewrite.
 
 The skill activates on its own trigger phrasing. It fires when you create,
 review, trim or "clean up" a context file, ask what belongs in one, complain
 that one is too long or ignored, or set up a new repo for coding agents. There
 is no slash command; it is an auto-invoked skill.
 
-The empirical claims it rests on come from Gloaguen, Mündler, Müller, Raychev,
-Vechev, _"Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for
-Coding Agents?"_ (2026), <https://arxiv.org/abs/2602.11988>.
+The empirical claims it rests on come chiefly from Gloaguen, Mündler, Müller,
+Raychev, Vechev, _"Evaluating AGENTS.md: Are Repository-Level Context Files
+Helpful for Coding Agents?"_ (v3, 2026), <https://arxiv.org/abs/2602.11988>,
+with later studies by Lulla et al., Khatri and McMillan. The skill's
+`references/measuring.md` summarizes each.
 
 ## Prerequisites
 
@@ -117,13 +132,13 @@ The module is not done until `task check` is green.
 
 ## Repository layout
 
-| Path                                   | Role                                                                |
-| -------------------------------------- | ------------------------------------------------------------------- |
-| `module/`                              | The installable module. lola reads only this.                       |
-| `module/skills/writing-context-files/` | The skill: `SKILL.md` plus `references/measuring.md`.               |
-| `.taskfiles/`                          | The two quality-gate scripts: structural linter and install oracle. |
-| `tests/`                               | bats suites and the deliberately-broken fixtures they lint.         |
-| `docs/module-internals.md`             | Maintainer documentation for the gates.                             |
+| Path                                   | Role                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------ |
+| `module/`                              | The installable module. lola reads only this.                            |
+| `module/skills/writing-context-files/` | The skill: `SKILL.md` plus `references/` (loading, security, measuring). |
+| `.taskfiles/`                          | The two quality-gate scripts: structural linter and install oracle.      |
+| `tests/`                               | bats suites and the deliberately-broken fixtures they lint.              |
+| `docs/module-internals.md`             | Maintainer documentation for the gates.                                  |
 
 To grow the module, add the component by hand under `module/` (a skill is a
 directory holding a `SKILL.md` with `name` and `description` frontmatter), then

@@ -143,6 +143,53 @@ silent on "write a README" (a lazily-loaded file, which the description
 excludes), and `references/measuring.md` was read in three of three runs that
 asked whether the file was worth keeping and in none of the other eleven.
 
+## What the October 2026 research refresh changed
+
+A survey of studies, harness documentation and security advisories published
+after v0.1.0 changed four things. The citations for the studies live in
+`references/measuring.md`; this section records why the skill moved.
+
+- **The cost argument.** Prompt caching bills a repeated static prefix at about
+  a tenth of the input price, so "every line is paid for on every request" was
+  weak as a token argument. Gloaguen et al. v3 attributes the 20–23% overhead
+  to behaviour — agents follow the file and test, explore and reason more —
+  and Lulla et al. measured the opposite sign (runtime −28.64%) with developer
+  files on real pull requests. The intro now rests on "agents act on every
+  line"; the stable finding is the absent success gain.
+- **Loading behaviour is harness-specific.** The skill had assumed nearest-file
+  loading and a tool-call cost for every link. Claude Code `@path` and Gemini
+  CLI `@file` imports inline eagerly; Codex CLI never loads an `AGENTS.md`
+  below its launch directory; Claude Code ignores `AGENTS.md` when a
+  `CLAUDE.md` exists; path-scoped rule files (Claude Code `paths:`, Copilot
+  `applyTo:`, Cursor `globs:`) are a scoping mechanism the sort lacked. Those
+  facts rot release by release, so they live in `references/loading.md`,
+  framed as questions to re-confirm, not in the method. Path-scoped rules
+  joined the *scope* bucket rather than becoming a sixth: the sort section has
+  no room for a sixth, and the two are the same decision — scope by place.
+- **Security.** Repository-controlled agent configuration has been an
+  execution vector repeatedly, and context files are an injection channel.
+  GitHub advisories that motivated the security pass: GHSA-4fgq-fpq9-mr3g
+  (CVE-2025-59536, Claude Code ran commands before the trust dialog),
+  GHSA-mmgp-wc2j-qcv7 (CVE-2026-33068, a repository settings file bypassed the
+  trust dialog), GHSA-q5hj-mxqh-vv77 (CVE-2026-40068, a spoofed worktree
+  bypassed trust and ran repository hooks), GHSA-ph6w-f82w-28w6 (Claude Code
+  startup-warning bypass), and GHSA-xrxf-jgv3-qmrm (CVE-2025-61260, Codex CLI
+  ran repository-supplied MCP configuration). Pillar Security's "Rules File
+  Backdoor" research showed invisible Unicode in rules files steering Cursor
+  and Copilot, and NVIDIA's AI Red Team showed a dependency writing an
+  untracked `AGENTS.md` at build time that Codex then obeyed. Hence the
+  raw-byte scan, the filesystem (not git-index) inventory, and the review of
+  adjacent agent config. The same advisories are why mechanization now prefers
+  CI gates to agent hooks.
+- **Agent-written files are the weakest kind.** Gloaguen et al. v3 found
+  developer-written files beat LLM-generated ones by 7%, which strengthens the
+  existing rule that a user-supplied fact with no trace in the repository is
+  the most valuable line available.
+
+The method sections changed, so the A/B harness above should be re-run before
+the next release; its fixtures plant no security defect, so it measures only
+that the existing method did not regress.
+
 ## What makes `module/` an installable lola module
 
 `lola mod add` and `lola install` operate on the `module/` directory, not the
@@ -353,7 +400,7 @@ on `PATH`, before the slower build and run steps run.
 `task lint:content` runs `uvx skillsaw@latest lint --strict .`, always the
 latest release, so a stale `uvx` cache never silently pins this repo to an
 older, weaker linter. But skillsaw's ruleset version is a separate concern from
-the binary version. `.skillsaw.yaml` sets `version: "0.17.0"` because if that
+the binary version. `.skillsaw.yaml` sets `version: "0.22.0"` because if that
 key is omitted, skillsaw assumes `0.6.0` and disables every rule added since. A
 strict-mode run would then look green while silently skipping most of what
 `--strict` is supposed to catch. Because the linter runs as `skillsaw@latest`,
@@ -362,55 +409,54 @@ content lint quietly gets weaker instead of failing loudly.
 
 `.skillsaw.yaml` also excludes `tests/fixtures/**` from the repo-wide
 `skillsaw lint --strict .` run: those fixtures must stay structurally broken to
-prove the linter catches them. It is the only exclusion — the template's second
-one covered the generator stubs, which this repo no longer ships. `module/`
+prove the linter catches them. The second exclusion, `.test-output/**`, covers
+gitignored local scratch — the A/B harness keeps deliberately-flawed fixture
+repositories there, and without the exclusion `task check` fails on any
+machine that has run it while CI, which never has the directory, stays
+green. `module/`
 itself is deliberately not excluded. It must pass skillsaw on its own merits.
 
 ### The baselined violations (`.skillsaw-baseline.json`)
 
-Eight violations are judged, rejected, and frozen in `.skillsaw-baseline.json`.
+Five violations are judged, rejected, and frozen in `.skillsaw-baseline.json`.
 Do not run `skillsaw fix` over this repo expecting an improvement, and do not
 refresh the baseline to make a new violation go away.
 
-`.skillsaw.yaml` promotes the three rules involved from `info` to `warning`
+`.skillsaw.yaml` promotes the rules involved from `info` to `warning`
 first. That is not a claim they matter more than skillsaw thinks — it is the
 only way to baseline them at all: `skillsaw baseline` captures errors and
 warnings only, and silently records nothing for info-level violations no matter
-what `fail-on` is set to. Left at `info`, these nine would be permanent `-v`
+what `fail-on` is set to. Left at `info`, these would be permanent `-v`
 noise that a genuinely new finding could hide in.
 
 Promoted and baselined, they are a ratchet instead. `--strict` fails on any
 violation of these rules not already in the baseline, so a new bare path or an
-over-long new section breaks the build. `content-actionability-score` is
-recorded in `floor` mode against each file's current score, so a file that
-drifts *less* actionable than it is today fails as well — verified by both
-cases, not assumed. Fingerprints are content-derived, not line-derived: the
-line-anchored entries survive edits that shift them up or down the file.
+over-long new section breaks the build. Fingerprints are content-derived, not
+line-derived: the line-anchored entries survive edits that shift them up or
+down the file, but rewording the flagged line itself mints a new entry.
 
 Refresh with `uvx skillsaw@latest baseline .` after a deliberate change, and
 review the diff. A shrinking baseline is good news. A growing one needs a
 reason in the commit message.
 
-Why each of the eight stands:
+Why each of the five stands:
 
-- `content-unlinked-internal-reference` flags `docs/grammar.md` in `SKILL.md`
-  and `module/AGENTS.md` in the root `AGENTS.md`. Neither file exists, and
-  neither is meant to: the first is a worked example of a *triggered link*, the
-  second is the deliberate absence documented above. Autofix would produce
-  markdown links to nothing — which is why skillsaw does not offer to fix
-  either one.
-- The same rule flags the genuinely-resolvable `docs/module-internals.md` and
-  `references/measuring.md` references, and offers to fix those. It should not.
-  An agent does not click, so `[path](path)` carries no information a backticked
-  path did not, at twice the tokens in a file loaded on every turn. Both
-  references already carry the thing that does matter — a trigger naming *when*
-  to read them — which is what the skill this module ships argues is the payload.
-- `content-actionability-score` rewards imperative verbs, shell commands, and
-  file paths. `SKILL.md` and `references/measuring.md` are a judgment method and
-  decision-support prose, not runbooks; the root `AGENTS.md` states facts an
-  agent cannot rederive, and verb-padding them would add words without adding
-  information. The low scores are the genre. The floor keeps them from becoming
-  an excuse.
+- `content-unlinked-internal-reference` flags the genuinely-resolvable
+  `docs/module-internals.md` references in the root `AGENTS.md`, and the
+  `references/loading.md`, `references/measuring.md` and
+  `references/security.md` pointers in `SKILL.md`, and offers to fix them. It
+  should not. An agent does not click, so `[path](path)` carries no information
+  a backticked path did not, at twice the tokens. Every one of these references
+  already carries the thing that does matter — a trigger naming *when* to read
+  it — which is what the skill this module ships argues is the payload.
+
+Three entries left the baseline when skillsaw 0.21.0 removed
+`content-actionability-score`, which had held each prose file to a floor on its
+imperative-verb, command and path density. Two more left when skillsaw 0.22.0
+stopped flagging paths that do not exist: `docs/grammar.md` in `SKILL.md` (a
+worked example of a triggered link) and `module/AGENTS.md` in the root
+`AGENTS.md` (the deliberate absence documented above).
+
 `content-section-length` also used to be here, flagging the sort section at ~673
 tokens on the argument that its four buckets are defined against each other and
 could not be split. The buckets could not, but the ungated-breadcrumb passage
@@ -435,27 +481,30 @@ request.
 
 ### The `SKILL.md` token ceiling
 
-`SKILL.md` is about 2,967 tokens against skillsaw's 3,000-token `skill` budget —
-roughly 33 tokens of headroom, a sentence. Adding to it without taking something
-out will fail `task check`.
+`SKILL.md` is about 2,943 tokens against skillsaw's 3,000-token `skill` budget —
+roughly 57 tokens of headroom, two sentences. Adding to it without taking
+something out will fail `task check`.
 
-The A/B fixes spent most of the 88 tokens that used to be here. If the next
-change needs room, the candidate with the best ratio is the `## Source`
-citation (~60 tokens): it is rationale rather than instruction, `README.md`
-already carries it in full, and `references/measuring.md` — reached by exactly
-the trigger "how do I prove this file helps" — is where a reader who wants the
-evidence is already going.
+The October 2026 research refresh paid for its additions — a security-pass
+trigger, a loading-reference trigger, the import-is-inlining line, path-scoped
+rules in the *scope* bucket, the hook caveat — by deleting the `## Source`
+section (its citations now live in `references/measuring.md`, behind the
+trigger "what evidence backs this method") and collapsing two "confirm your
+harness" asides into the single `references/loading.md` pointer. The next
+candidate, if room is needed, is the intro's second paragraph.
 
 `context-budget` is not one of the baselined rules. It ships at **warning**
 severity, `lint:content` runs `--strict`, and warnings fail there, so this gate
 goes red rather than quiet.
 
-This is what `references/measuring.md` is for. Nineteen lines is small enough to
-look like pointless indirection, and rolling it into `SKILL.md` was tried: the
-result was 3,227 tokens and a red gate. The reference file is load-bearing, not
-decoration. It also holds the content most safely deferred — guidance for the
-human deciding whether a file is worth keeping, which the audit itself never
-reads — so it is the right thing to have on the far side of a trigger.
+This is what `references/` is for. `measuring.md` was once nineteen lines, small
+enough to look like pointless indirection, and rolling it into `SKILL.md` was
+tried: the result was 3,227 tokens and a red gate. The reference files are
+load-bearing, not decoration. Each holds content needed only at one point in the
+method — the evidence and the keep-or-drop guidance for the human
+(`measuring.md`), the harness loading questions asked before placing a rule
+(`loading.md`), the security pass run before classifying (`security.md`) — so
+each sits on the far side of a trigger naming that point.
 
 When you hit the ceiling, pay for the addition with a deletion, or move the
 least-often-needed content into `references/`. Do not raise the limit in

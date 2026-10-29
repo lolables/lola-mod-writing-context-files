@@ -4,6 +4,45 @@ All notable changes to this module are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `references/security.md`, a security pass run on every audit and authored
+  file. It treats a context file the user did not write as untrusted input:
+  inventory every instruction file the harness would load, including untracked
+  ones and symlinks leaving the repository; scan raw bytes for invisible and
+  bidirectional Unicode and read markup that renders as nothing; flag
+  instructions that exfiltrate data, follow remote content, install from
+  unverified sources or weaken safety; propose removing secrets; and review the agent config beside the file (hooks,
+  MCP servers, auto-approve settings, endpoint overrides) that executes code.
+  Findings lead the audit table under a new `security` verdict.
+- `references/loading.md`, the loading questions to confirm per target harness
+  before placing a rule: eager `@` imports, which subdirectory files load (Codex
+  CLI never loads one below its launch directory), path-scoped rule files,
+  which filename wins when several exist, and size caps.
+
+### Changed
+
+- The *scope* bucket now covers path-scoped rule files (glob-matched rules)
+  alongside subdirectory files, and the *link* bucket states that an import
+  directive is inlining, not linking.
+- Mechanization prefers CI gates and linters to agent-harness hooks: a
+  committed hook is code every clone runs with its user's privileges, and a
+  model-judged hook is probabilistic again.
+- The cost framing no longer rests on per-turn token price, which prompt
+  caching makes small; it rests on agents acting on every line.
+- The evidence moved from the skill body to `references/measuring.md` and now
+  cites Gloaguen et al. v3 (developer-written files beat LLM-generated ones by
+  7%), Lulla et al. (an `AGENTS.md` cut runtime 28.64%, so the cost effect is
+  setup-dependent), Khatri (no correctness effect; the one useful line was a
+  non-discoverable gotcha) and McMillan (file size and structure did not affect
+  adherence).
+- `.skillsaw.yaml` tracks skillsaw 0.22.0, drops the removed
+  `content-actionability-score` rule, and excludes the gitignored
+  `.test-output/` scratch directory. The baseline shrank from eight entries to
+  five.
+
 ## [0.1.0] - 2026-07-30
 
 First release.
