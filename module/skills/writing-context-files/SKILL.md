@@ -159,19 +159,20 @@ in place leaves the file now.
 1. List everything you're tempted to include.
 2. Run the discoverability test on each item; drop every "yes."
 3. Route mechanizable rules to hooks / linters / CI gates; note them for the user.
-4. Place each survivor: inline (always), linked-with-trigger (sometimes),
-   scoped to a subtree (local to one directory), or annotated at its site in
-   the code.
+4. Read `references/loading.md`, then place each survivor: inline (always),
+   linked-with-trigger (sometimes), scoped to a subtree or file pattern, or
+   annotated at its site in the code.
 5. Write it tight — every line non-discoverable and imperative — and account
    for every item from step 1: placed, mechanized or deleted, never silently
    dropped.
+6. Run the security pass in `references/security.md` over the result.
 
 **Auditing an existing file:** before classifying anything, resolve every
 command, target and path the file names against the repository. An item routed
 to *mechanize* or *scope* never gets checked otherwise, and proposing a CI gate
 around a `make` target that no longer exists automates a footgun — agents obey
 wrong instructions as readily as right ones. Run the security pass in
-`references/security.md` — on authoring too. Then classify each section:
+`references/security.md`. Then classify each section:
 
 - Overview / architecture / "how it works" prose → flag for **deletion**
   (offer to relocate to maintainer docs).

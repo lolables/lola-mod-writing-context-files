@@ -103,6 +103,16 @@ repetitions per cell; a separate judge scoring each item against the key with a
 required verbatim evidence quote. Re-run it with `run-one.sh`, `judge-one.sh`
 and `tally.sh` after changing the method sections.
 
+The scripts hard-code `/tmp/ab` and expect it populated: `fixtures/` and
+`prompts/` copied from `.test-output/ab/` (the `probe-measure` fixture is a copy
+of `audit`), the `rubric-*.md` files, an empty `judgedir/`, and one config
+directory per arm — `cfg-control/` holding only a copy of
+`~/.claude/.credentials.json`, `cfg-treat/` holding the same plus
+`skills/writing-context-files/` copied from `module/skills/`. A further arm,
+such as the previous release's skill exported with `git archive`, is another
+`cfg-<arm>/` directory. `drive.sh` runs the matrix four at a time, judges it
+and tallies it.
+
 The skill won 21.0/22 against control's 10.0/22 on auditing an existing file,
 and 19.5/22 against 10.75/22 on authoring one — but the useful part is *where*.
 Control scored near zero on mechanization, subtree scoping, trigger-attachment
@@ -186,9 +196,26 @@ after v0.1.0 changed four things. The citations for the studies live in
   existing rule that a user-supplied fact with no trace in the repository is
   the most valuable line available.
 
-The method sections changed, so the A/B harness above should be re-run before
-the next release; its fixtures plant no security defect, so it measures only
-that the existing method did not regress.
+The A/B harness was re-run on 2026-10-29 against `claude-sonnet-5-5` subjects
+and an `opus` judge, with a third arm holding v0.1.0's skill to separate the
+skill change from the model change. Mean rubric scores out of 22, n=4:
+
+| fixture | control | v0.1.0 | this release, first cut | this release |
+| --- | --- | --- | --- | --- |
+| audit | 16.5 | — | 22.0 | 22.0 |
+| author | 14.25 | 19.25 | 18.75 | 20.75 |
+
+Two things came out of it. The subtree-scoping item (B7) fell from 1.75 in July
+to 0 for *both* skill versions, so the newer model, not the edit, stopped
+writing `infra/AGENTS.md`. And the first cut placed the `loading.md` and
+`security.md` triggers only in the intro and the audit paragraph: none of four
+authoring runs read either reference. Moving them into authoring steps 4 and 6
+got `loading.md` read 4/4 and `security.md` 3/4, lifted B7 to 0.75 and the
+authoring mean to 20.75. A trigger must sit on the path the agent walks, not
+beside it. On these clean fixtures the security pass costs about a line of
+reply and raised no false alarm the judge penalised; the fixtures plant no
+security defect, so the run measures non-regression only. `measuring.md` was
+still read 3/3 on the worth-keeping probe.
 
 ## What makes `module/` an installable lola module
 
@@ -418,7 +445,7 @@ itself is deliberately not excluded. It must pass skillsaw on its own merits.
 
 ### The baselined violations (`.skillsaw-baseline.json`)
 
-Five violations are judged, rejected, and frozen in `.skillsaw-baseline.json`.
+Seven violations are judged, rejected, and frozen in `.skillsaw-baseline.json`.
 Do not run `skillsaw fix` over this repo expecting an improvement, and do not
 refresh the baseline to make a new violation go away.
 
@@ -439,12 +466,14 @@ Refresh with `uvx skillsaw@latest baseline .` after a deliberate change, and
 review the diff. A shrinking baseline is good news. A growing one needs a
 reason in the commit message.
 
-Why each of the five stands:
+Why each of the seven stands:
 
 - `content-unlinked-internal-reference` flags the genuinely-resolvable
   `docs/module-internals.md` references in the root `AGENTS.md`, and the
   `references/loading.md`, `references/measuring.md` and
-  `references/security.md` pointers in `SKILL.md`, and offers to fix them. It
+  `references/security.md` pointers in `SKILL.md` — the intro, the authoring
+  steps and the audit paragraph each name the reference where it is needed —
+  and offers to fix them. It
   should not. An agent does not click, so `[path](path)` carries no information
   a backticked path did not, at twice the tokens. Every one of these references
   already carries the thing that does matter — a trigger naming *when* to read
@@ -481,8 +510,8 @@ request.
 
 ### The `SKILL.md` token ceiling
 
-`SKILL.md` is about 2,943 tokens against skillsaw's 3,000-token `skill` budget —
-roughly 57 tokens of headroom, two sentences. Adding to it without taking
+`SKILL.md` is about 2,962 tokens against skillsaw's 3,000-token `skill` budget —
+roughly 38 tokens of headroom, a sentence. Adding to it without taking
 something out will fail `task check`.
 
 The October 2026 research refresh paid for its additions — a security-pass

@@ -24,6 +24,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- The authoring workflow reads `references/loading.md` before placing rules
+  and ends with the security pass. An A/B re-run found authoring agents never
+  reached either trigger while it sat only in the intro and audit paragraph.
 - The *scope* bucket now covers path-scoped rule files (glob-matched rules)
   alongside subdirectory files, and the *link* bucket states that an import
   directive is inlining, not linking.
@@ -40,8 +43,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   adherence).
 - `.skillsaw.yaml` tracks skillsaw 0.22.0, drops the removed
   `content-actionability-score` rule, and excludes the gitignored
-  `.test-output/` scratch directory. The baseline shrank from eight entries to
-  five.
+  `.test-output/` scratch directory. The baseline went from eight entries to
+  seven: five old ones resolved, and the new `references/` trigger pointers are
+  rejected for the reason already recorded.
 
 ## [0.1.0] - 2026-07-30
 

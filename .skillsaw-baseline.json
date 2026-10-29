@@ -1,7 +1,7 @@
 {
   "version": "1",
   "generated_by": "skillsaw 0.22.0",
-  "generated_at": "2026-10-29T16:31:21.584689+00:00",
+  "generated_at": "2026-10-29T18:17:02.060271+00:00",
   "violations": [
     {
       "fingerprint": "c51bc9c958e9422f",
@@ -36,10 +36,26 @@
       "severity": "warning"
     },
     {
-      "fingerprint": "bc810eea94b43e6e",
+      "fingerprint": "a9f663fe94fa42a9",
       "rule_id": "content-unlinked-internal-reference",
       "file_path": "module/skills/writing-context-files/SKILL.md",
-      "line": 174,
+      "line": 162,
+      "message": "Unlinked path reference: 'references/loading.md' \u2014 consider wrapping in link syntax [references/loading.md](references/loading.md)",
+      "severity": "warning"
+    },
+    {
+      "fingerprint": "a5e2e13ccf1f9451",
+      "rule_id": "content-unlinked-internal-reference",
+      "file_path": "module/skills/writing-context-files/SKILL.md",
+      "line": 168,
+      "message": "Unlinked path reference: 'references/security.md' \u2014 consider wrapping in link syntax [references/security.md](references/security.md)",
+      "severity": "warning"
+    },
+    {
+      "fingerprint": "9e47874e8ea74212",
+      "rule_id": "content-unlinked-internal-reference",
+      "file_path": "module/skills/writing-context-files/SKILL.md",
+      "line": 175,
       "message": "Unlinked path reference: 'references/security.md' \u2014 consider wrapping in link syntax [references/security.md](references/security.md)",
       "severity": "warning"
     }
