@@ -1,0 +1,30 @@
+CHANGELOG.md
+  s_aa2bd794e1940b::t_0df04ef6f4129c 11-12,18-20,40-42
+docs/module-internals.md
+  s_aa2bd794e1940b::t_0df04ef6f4129c 237-256,551-561
+.skillsaw-baseline.json
+  s_aa2bd794e1940b::t_c5baa976372a67 4,23,26,34,42,47,50
+module/skills/writing-context-files/SKILL.md
+  s_aa2bd794e1940b::t_c5baa976372a67 153,172-173
+  s_aa2bd794e1940b::t_98fd68ef7da7e5 21-23,44-46,63-65,77-78,91,118-120,127,150,156-157,186-188
+  s_aa2bd794e1940b::t_93d6bc64529630 174-182
+  s_aa2bd794e1940b::t_1839311094d3d3 205-206
+  s_aa2bd794e1940b::t_fdedcf6d226391 158-159,170-171
+  s_aa2bd794e1940b::t_f0b9035438d374 183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d0a5504122ec9ca18ca58ae8ec5c6aa90e5d63f",
+  "prompts": {},
+  "sessions": {
+    "s_aa2bd794e1940b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43b39d3-c7d7-47bb-aaa9-7448b51e8cad",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "writing-context-files <writing-context-files@invalid>"
+    }
+  }
+}
