@@ -12,7 +12,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   file. It treats a context file the user did not write as untrusted input:
   inventory every instruction file the harness would load, including untracked
   ones and symlinks leaving the repository; scan raw bytes for invisible and
-  bidirectional Unicode and read markup that renders as nothing; flag
+  bidirectional Unicode and list HTML comments and `<details>` blocks from the
+  file on disk, since a harness may strip them from the copy it loads; flag
   instructions that exfiltrate data, follow remote content, install from
   unverified sources or weaken safety; propose removing secrets; and review the agent config beside the file (hooks,
   MCP servers, auto-approve settings, endpoint overrides) that executes code.
