@@ -234,11 +234,26 @@ deleted the registry rule.
 The base model catches the invisible Unicode, the untracked file and the
 credential unaided. The skill's measurable gain is the agent config beside the
 file (S4: control 0.5, this release 2.0 whenever `security.md` was read). That
-qualifier is the open problem: `security.md` was read in only 9 of 16 audits,
-and S4 averaged 1.0 in the other seven. The HTML comment (S7) is caught about
-half the time regardless — the harness strips it from the copy it loads, and
-whether the agent re-reads the raw file is unaffected by wording; two prose
-fixes and a mechanized `grep` in `security.md` left it at the same rate.
+qualifier was the problem: behind a pointer, `security.md` was read in only 9
+of 16 audits, and S4 averaged 1.0 in the other seven. The HTML comment (S7) was
+caught about half the time whatever the wording — the harness strips it from
+the copy it loads, and agents trusted that copy.
+
+The fix was the skill's own rule — always needed, so inline it. The security
+pass's three high-yield steps (read every instruction file from disk, run the
+scans, list the agent config beside it) moved into a `### The security pass`
+subsection of `SKILL.md`, which took the body to 3,129 tokens. The skill was
+then run on its own `SKILL.md`: ten cuts, all rationale or restatement, went to
+an adversarial reviewer, which restored one (a stale command is fixed or
+deleted, never mechanized — the D2 defect above) and reworded another (the
+mechanization sentence had lost its instruction). The body landed at 2,784
+tokens with the core inline. Re-run, n=4: audit 22.0, `secaudit` 21.5 with S4
+at 2.0 in every run and S7 at 1.5, the worth-keeping probe still reading
+`measuring.md` 3/3. Authoring came in at 19.5 over eight runs against 20.75 in
+the four before the trim; a single-variable check (dropping the one word the
+trim added to the authoring path) scored 19.0, and every skill variant measured
+this month falls within 18.75–20.75 at n=4, so the gap is read as noise. B7
+(subtree scoping) sits near zero for this model whatever the wording.
 
 ## What makes `module/` an installable lola module
 
@@ -533,17 +548,17 @@ request.
 
 ### The `SKILL.md` token ceiling
 
-`SKILL.md` is about 2,962 tokens against skillsaw's 3,000-token `skill` budget —
-roughly 38 tokens of headroom, a sentence. Adding to it without taking
-something out will fail `task check`.
+`SKILL.md` is about 2,784 tokens against skillsaw's 3,000-token `skill` budget —
+roughly 216 tokens of headroom. Adding to it without taking something out will
+eventually fail `task check`.
 
-The October 2026 research refresh paid for its additions — a security-pass
-trigger, a loading-reference trigger, the import-is-inlining line, path-scoped
-rules in the *scope* bucket, the hook caveat — by deleting the `## Source`
-section (its citations now live in `references/measuring.md`, behind the
-trigger "what evidence backs this method") and collapsing two "confirm your
-harness" asides into the single `references/loading.md` pointer. The next
-candidate, if room is needed, is the intro's second paragraph.
+The October 2026 refresh first paid for its additions by deleting the `##
+Source` section (its citations now live in `references/measuring.md`, behind
+the trigger "what evidence backs this method") and collapsing two "confirm your
+harness" asides into the single `references/loading.md` pointer. Inlining the
+security pass then overran the budget, and the skill's own audit recovered 358
+tokens of rationale — see the `secaudit` notes above. What remains is
+instruction; the next cut will have to argue with an A/B-backed passage.
 
 `context-budget` is not one of the baselined rules. It ships at **warning**
 severity, `lint:content` runs `--strict`, and warnings fail there, so this gate

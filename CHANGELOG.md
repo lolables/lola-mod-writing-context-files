@@ -8,15 +8,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- `references/security.md`, a security pass run on every audit and authored
-  file. It treats a context file the user did not write as untrusted input:
+- A security pass, run on every audit and authored file, inline in `SKILL.md`
+  with its commands and checklist in `references/security.md`. It treats a context file the user did not write as untrusted input:
   inventory every instruction file the harness would load, including untracked
   ones and symlinks leaving the repository; scan raw bytes for invisible and
   bidirectional Unicode and list HTML comments and `<details>` blocks from the
   file on disk, since a harness may strip them from the copy it loads; flag
   instructions that exfiltrate data, follow remote content, install from
-  unverified sources or weaken safety; propose removing secrets; and review the agent config beside the file (hooks,
-  MCP servers, auto-approve settings, endpoint overrides) that executes code.
+  unverified sources or weaken safety; propose removing secrets; and review
+  the agent config beside the file (hooks, MCP servers, auto-approve settings,
+  folder-open tasks, endpoint overrides) that executes code.
   Findings lead the audit table under a new `security` verdict.
 - `references/loading.md`, the loading questions to confirm per target harness
   before placing a rule: eager `@` imports, which subdirectory files load (Codex
@@ -36,6 +37,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   model-judged hook is probabilistic again.
 - The cost framing no longer rests on per-turn token price, which prompt
   caching makes small; it rests on agents acting on every line.
+- `SKILL.md` was audited with its own method to make room for the inline
+  security pass: 358 tokens of rationale and restatement removed after an
+  adversarial review, every instruction kept.
 - The evidence moved from the skill body to `references/measuring.md` and now
   cites Gloaguen et al. v3 (developer-written files beat LLM-generated ones by
   7%), Lulla et al. (an `AGENTS.md` cut runtime 28.64%, so the cost effect is
