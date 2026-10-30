@@ -4,6 +4,54 @@ All notable changes to this module are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- A security pass, run on every audit and authored file, inline in `SKILL.md`
+  with its commands and checklist in `references/security.md`. It treats a context file the user did not write as untrusted input:
+  inventory every instruction file the harness would load, including untracked
+  ones and symlinks leaving the repository; scan raw bytes for invisible and
+  bidirectional Unicode and list HTML comments and `<details>` blocks from the
+  file on disk, since a harness may strip them from the copy it loads; flag
+  instructions that exfiltrate data, follow remote content, install from
+  unverified sources or weaken safety; propose removing secrets; and review
+  the agent config beside the file (hooks, MCP servers, auto-approve settings,
+  folder-open tasks, endpoint overrides) that executes code.
+  Findings lead the audit table under a new `security` verdict.
+- `references/loading.md`, the loading questions to confirm per target harness
+  before placing a rule: eager `@` imports, which subdirectory files load (Codex
+  CLI never loads one below its launch directory), path-scoped rule files,
+  which filename wins when several exist, and size caps.
+
+### Changed
+
+- The authoring workflow reads `references/loading.md` before placing rules
+  and ends with the security pass. An A/B re-run found authoring agents never
+  reached either trigger while it sat only in the intro and audit paragraph.
+- The *scope* bucket now covers path-scoped rule files (glob-matched rules)
+  alongside subdirectory files, and the *link* bucket states that an import
+  directive is inlining, not linking.
+- Mechanization prefers CI gates and linters to agent-harness hooks: a
+  committed hook is code every clone runs with its user's privileges, and a
+  model-judged hook is probabilistic again.
+- The cost framing no longer rests on per-turn token price, which prompt
+  caching makes small; it rests on agents acting on every line.
+- `SKILL.md` was audited with its own method to make room for the inline
+  security pass: 358 tokens of rationale and restatement removed after an
+  adversarial review, every instruction kept.
+- The evidence moved from the skill body to `references/measuring.md` and now
+  cites Gloaguen et al. v3 (developer-written files beat LLM-generated ones by
+  7%), Lulla et al. (an `AGENTS.md` cut runtime 28.64%, so the cost effect is
+  setup-dependent), Khatri (no correctness effect; the one useful line was a
+  non-discoverable gotcha) and McMillan (file size and structure did not affect
+  adherence).
+- `.skillsaw.yaml` tracks skillsaw 0.22.0, drops the removed
+  `content-actionability-score` rule, and excludes the gitignored
+  `.test-output/` scratch directory. The baseline went from eight entries to
+  seven: five old ones resolved, and the new `references/` trigger pointers are
+  rejected for the reason already recorded.
+
 ## [0.1.0] - 2026-07-30
 
 First release.
